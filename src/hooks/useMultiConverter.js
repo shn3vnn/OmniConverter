@@ -71,7 +71,13 @@ export function useMultiConverter() {
         update(item.id, { status: 'done', progress: 100, downloadUrl: url, convertedName: name, convertedSize: formatBytes(blob.size) })
         results.push({ blob, name })
       } catch (err) {
-        update(item.id, { status: 'error', error: err.message || 'Konversi gagal' })
+        const message = String(err?.message || 'Konversi gagal')
+        const friendlyMessage = message.includes('USE_CLOUD')
+          ? 'Konversi ini membutuhkan CloudConvert. Pastikan VITE_CLOUDCONVERT_API_KEY tersedia di environment deploy atau jalankan backend lokal dengan LibreOffice.'
+          : /CloudConvert API key|VITE_CLOUDCONVERT_API_KEY/.test(message)
+            ? 'CloudConvert API key tidak tersedia. Tambahkan VITE_CLOUDCONVERT_API_KEY pada environment deploy atau jalankan backend lokal.'
+            : message
+        update(item.id, { status: 'error', error: friendlyMessage })
       }
     }
 

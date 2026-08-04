@@ -67,7 +67,11 @@ export function useConverter() {
       setIsComplete(true)
     } catch (err) {
       clearInterval(intervalRef.current)
-      setError(err.message || 'Konversi gagal. Silakan coba file lain.')
+      const message = String(err?.message || 'Konversi gagal. Silakan coba file lain.')
+      const friendlyMessage = message.includes('USE_CLOUD') || /CloudConvert API key|VITE_CLOUDCONVERT_API_KEY/.test(message)
+        ? 'Konversi PDF → Word membutuhkan CloudConvert API. Pastikan VITE_CLOUDCONVERT_API_KEY sudah di-set dan lakukan redeploy.'
+        : message
+      setError(friendlyMessage)
     } finally {
       setIsProcessing(false)
     }

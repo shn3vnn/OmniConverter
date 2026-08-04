@@ -2,7 +2,15 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 
 export async function isBackendAvailable() {
   try {
-    const res = await fetch(`${BACKEND_URL}/health`, { signal: AbortSignal.timeout(2000) })
+    new URL(BACKEND_URL)
+  } catch {
+    return false
+  }
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 2000)
+    const res = await fetch(`${BACKEND_URL}/health`, { signal: controller.signal })
+    clearTimeout(timer)
     return res.ok
   } catch {
     return false
@@ -26,12 +34,29 @@ export async function convertWithLocalBackend(file, outputFormat, onProgress) {
   onProgress?.(90)
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    // Backend signals to use CloudConvert instead
-    if (res.status === 422 && err.useCloud) {
-      throw Object.assign(new Error('USE_CLOUD'), { useCloud: true })
+    let err = {}
+    try {
+      err = await res.json()
+    } catch {
+      const text = await res.text().catch(() => '')
+      err = { error: text }
     }
-    throw new Error(err.error || `Backend error: ${res.status}`)
+
+    const errorText = String(err.error || err.message || '')
+    const useCloud = res.status === 422 && (
+      err.useCloud === true ||
+      errorText === 'USE_CLOUD' ||
+      errorText.includes('USE_CLOUD')
+    )
+
+    if (useCloud) {
+      throw Object.assign(
+        new Error('Backend lokal tidak mendukung konversi ini. Gunakan CloudConvert atau jalankan backend lokal Anda sendiri.'),
+        { useCloud: true }
+      )
+    }
+
+    throw new Error(err.error || err.message || `Backend error: ${res.status}`)
   }
 
   const blob = await res.blob()

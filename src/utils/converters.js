@@ -150,9 +150,14 @@ export async function convertFile(file, targetFormat, onProgress) {
       return await convertWithLocalBackend(file, targetFormat, onProgress)
     } catch (err) {
       // Backend says to use CloudConvert for this format pair
-      if (err.useCloud && hasApiKey()) {
-        const { blob } = await convertFileCloud(file, targetFormat, onProgress)
-        return blob
+      if (err.useCloud) {
+        if (hasApiKey()) {
+          const { blob } = await convertFileCloud(file, targetFormat, onProgress)
+          return blob
+        }
+        throw new Error(
+          'Konversi ini membutuhkan CloudConvert, tetapi API key CloudConvert tidak tersedia. Tambahkan VITE_CLOUDCONVERT_API_KEY pada build atau jalankan backend lokal.'
+        )
       }
       throw err
     }
