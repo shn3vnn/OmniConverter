@@ -143,21 +143,27 @@ export async function convertFile(file, targetFormat, onProgress) {
     return convertImageFormat(file, targetFormat)
   }
 
+  // PDF → DOCX: langsung CloudConvert (backend tidak support)
+  if (ext === 'pdf' && targetFormat === 'docx') {
+    if (hasApiKey()) {
+      const { blob } = await convertFileCloud(file, targetFormat, onProgress)
+      return blob
+    }
+    throw new Error('Konversi PDF → Word membutuhkan CloudConvert API key.')
+  }
+
   // Priority 1: Local backend (LibreOffice)
   const backendUp = await isBackendAvailable()
   if (backendUp) {
     try {
       return await convertWithLocalBackend(file, targetFormat, onProgress)
     } catch (err) {
-      // Backend says to use CloudConvert for this format pair
       if (err.useCloud) {
         if (hasApiKey()) {
           const { blob } = await convertFileCloud(file, targetFormat, onProgress)
           return blob
         }
-        throw new Error(
-          'Konversi ini membutuhkan CloudConvert, tetapi API key CloudConvert tidak tersedia. Tambahkan VITE_CLOUDCONVERT_API_KEY pada build atau jalankan backend lokal.'
-        )
+        throw new Error('Konversi ini membutuhkan CloudConvert, tetapi API key tidak tersedia.')
       }
       throw err
     }
