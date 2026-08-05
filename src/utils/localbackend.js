@@ -1,5 +1,4 @@
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001').trim()
-console.log('BACKEND_URL:', JSON.stringify(BACKEND_URL))
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001').replace(/\s+/g, '')
 
 export async function isBackendAvailable() {
   try {
