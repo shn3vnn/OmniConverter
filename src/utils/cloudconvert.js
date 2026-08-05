@@ -21,6 +21,7 @@ export async function convertWithCloudConvert(file, outputFormat, onProgress) {
   if (!API_KEY || API_KEY === 'your_api_key_here') {
     throw new Error('CloudConvert API key belum diisi. Tambahkan VITE_CLOUDCONVERT_API_KEY di file .env')
   }
+  console.log('CloudConvert API key exists:', !!API_KEY, 'length:', API_KEY?.length)
 
   const inputFormat = file.name.split('.').pop().toLowerCase()
 

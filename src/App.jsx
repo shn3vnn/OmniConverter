@@ -174,7 +174,7 @@ export default function App() {
               <p className="text-sm font-semibold text-slate-900 dark:text-white">Kenapa tim memilih OmniConvert?</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                 <li>• Konversi beberapa file sekaligus</li>
-                <li>• Engine LibreOffice — hasil akurat & professional</li>
+                <li>• Engine LibreOffice hasil akurat & professional</li>
                 <li>• File tidak pernah keluar dari perangkat kamu</li>
               </ul>
             </div>
