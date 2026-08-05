@@ -51,8 +51,10 @@ export async function convertWithCloudConvert(file, outputFormat, onProgress) {
   // Step 2: Upload the file to the upload task URL
   onProgress?.(25)
   const uploadTask = job.tasks.find((t) => t.name === 'upload-file')
-  const uploadUrl = uploadTask.result?.form?.url
-  const uploadParams = uploadTask.result?.form?.parameters || {}
+  const uploadUrl = uploadTask?.result?.form?.url
+  const uploadParams = uploadTask?.result?.form?.parameters || {}
+
+  if (!uploadUrl) throw new Error('Gagal mendapatkan upload URL dari CloudConvert')
 
   const formData = new FormData()
   Object.entries(uploadParams).forEach(([key, val]) => formData.append(key, val))
