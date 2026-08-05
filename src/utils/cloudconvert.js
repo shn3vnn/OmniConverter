@@ -51,11 +51,21 @@ export async function convertWithCloudConvert(file, outputFormat, onProgress) {
 
   // Step 2: Upload the file to the upload task URL
   onProgress?.(25)
-  const uploadTask = job.tasks.find((t) => t.name === 'upload-file')
-  const uploadUrl = uploadTask?.result?.form?.url
-  const uploadParams = uploadTask?.result?.form?.parameters || {}
 
-  if (!uploadUrl) throw new Error('Gagal mendapatkan upload URL dari CloudConvert')
+  // Poll until upload task has result with form URL
+  let uploadTask = job.tasks.find((t) => t.name === 'upload-file')
+  let uploadUrl = uploadTask?.result?.form?.url
+
+  if (!uploadUrl) {
+    // Re-fetch job to get upload URL
+    const { data: freshJob } = await apiFetch(`/jobs/${job.id}`)
+    uploadTask = freshJob.tasks.find((t) => t.name === 'upload-file')
+    uploadUrl = uploadTask?.result?.form?.url
+  }
+
+  if (!uploadUrl) throw new Error('Gagal mendapatkan upload URL dari CloudConvert. Coba lagi.')
+
+  const uploadParams = uploadTask?.result?.form?.parameters || {}
 
   const formData = new FormData()
   Object.entries(uploadParams).forEach(([key, val]) => formData.append(key, val))
