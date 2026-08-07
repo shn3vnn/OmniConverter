@@ -65,6 +65,10 @@ export async function convertWithLocalBackend(file, outputFormat, onProgress) {
 }
 
 export async function getSupportedFormats() {
-  const res = await fetch(`${BACKEND_URL}/formats`)
-  return res.json()
+  try {
+    const res = await fetch(`${BACKEND_URL}/formats`)
+    return res.json()
+  } catch {
+    return {}
+  }
 }
