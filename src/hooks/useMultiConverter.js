@@ -7,7 +7,8 @@ const EXT_DEFAULT_FORMAT = {
   docx: 'pdf', doc: 'pdf', pdf: 'docx',
   pptx: 'pdf', ppt: 'pdf',
   xlsx: 'pdf', xls: 'pdf',
-  png: 'webp', jpg: 'png', jpeg: 'png', webp: 'png',
+  png: 'pdf', jpg: 'pdf', jpeg: 'pdf', webp: 'pdf',
+  tiff: 'pdf', tif: 'pdf', html: 'pdf', htm: 'pdf',
 }
 
 function makeItem(file) {

@@ -137,20 +137,28 @@ export async function convertFile(file, targetFormat, onProgress) {
 
   const IMAGE_FORMATS = ['png', 'jpg', 'jpeg', 'webp']
 
-  // Image → Image always local
+  // Image → Image always local (bukan ke PDF)
   if (IMAGE_FORMATS.includes(ext) && IMAGE_FORMATS.includes(targetFormat)) {
     if (ext === targetFormat) return file
     return convertImageFormat(file, targetFormat)
   }
 
-  // PDF → format lain: langsung CloudConvert
-  const CLOUD_ONLY_FROM_PDF = ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'html']
-  if (ext === 'pdf' && CLOUD_ONLY_FROM_PDF.includes(targetFormat)) {
+  // Format yang butuh CloudConvert langsung
+  const CLOUD_ONLY_SOURCES = ['pdf', 'tiff', 'tif', 'html', 'htm']
+  const CLOUD_FROM_PDF = ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'html']
+  const CLOUD_TO_PDF = ['jpg', 'jpeg', 'png', 'webp', 'tiff', 'tif', 'html', 'htm']
+
+  const needsCloud =
+    (ext === 'pdf' && CLOUD_FROM_PDF.includes(targetFormat)) ||
+    (CLOUD_TO_PDF.includes(ext) && targetFormat === 'pdf') ||
+    (CLOUD_ONLY_SOURCES.includes(ext) && ext !== 'pdf')
+
+  if (needsCloud) {
     if (hasApiKey()) {
       const { blob } = await convertFileCloud(file, targetFormat, onProgress)
       return blob
     }
-    throw new Error(`Konversi PDF → ${targetFormat.toUpperCase()} membutuhkan CloudConvert API key.`)
+    throw new Error(`Konversi ${ext.toUpperCase()} → ${targetFormat.toUpperCase()} membutuhkan CloudConvert API key.`)
   }
 
   // Priority 1: Local backend (LibreOffice)

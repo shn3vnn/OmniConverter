@@ -1,7 +1,7 @@
 import { formatBytes } from '../utils/formatBytes'
 
 // Semua format yang ada
-const ALL_FORMATS = ['PDF', 'DOCX', 'DOC', 'ODT', 'TXT', 'PPT', 'PPTX', 'XLS', 'XLSX', 'CSV', 'PNG', 'JPG', 'JPEG', 'WEBP']
+const ALL_FORMATS = ['PDF', 'DOCX', 'DOC', 'ODT', 'TXT', 'PPT', 'PPTX', 'XLS', 'XLSX', 'CSV', 'PNG', 'JPG', 'JPEG', 'WEBP', 'HTML', 'TIFF']
 
 // Format yang didukung per ekstensi
 const SUPPORTED_FORMATS = {
@@ -12,10 +12,14 @@ const SUPPORTED_FORMATS = {
   ppt:  ['pdf', 'pptx'],
   xlsx: ['pdf', 'xls', 'csv'],
   xls:  ['pdf', 'xlsx', 'csv'],
-  png:  ['webp', 'jpg', 'jpeg'],
-  jpg:  ['webp', 'png', 'jpeg'],
-  jpeg: ['webp', 'png', 'jpg'],
-  webp: ['png', 'jpg', 'jpeg'],
+  png:  ['pdf', 'webp', 'jpg', 'jpeg'],
+  jpg:  ['pdf', 'webp', 'png', 'jpeg'],
+  jpeg: ['pdf', 'webp', 'png', 'jpg'],
+  webp: ['pdf', 'png', 'jpg', 'jpeg'],
+  tiff: ['pdf'],
+  tif:  ['pdf'],
+  html: ['pdf'],
+  htm:  ['pdf'],
 }
 
 function getFormatOptions(ext) {
