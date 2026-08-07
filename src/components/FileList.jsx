@@ -71,8 +71,8 @@ export default function FileList({ items, isConverting, onRemove, onFormatChange
 
               {/* Info */}
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{item.file.name}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="truncate text-sm font-semibold text-slate-900 dark:text-white max-w-[160px] sm:max-w-none">{item.file.name}</p>
                   <div className="flex flex-shrink-0 items-center gap-2">
                     {/* Format selector */}
                     {item.status === 'idle' && (

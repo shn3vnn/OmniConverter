@@ -101,6 +101,7 @@ function Dropdown({ label, children, open, onToggle, align = 'left' }) {
 
 export default function Header({ onStartClick, dark, onToggleDark }) {
   const [openMenu, setOpenMenu] = useState(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const toggle = (name) => (val) => setOpenMenu(val ? name : null)
 
   return (
@@ -109,17 +110,34 @@ export default function Header({ onStartClick, dark, onToggleDark }) {
 
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl overflow-hidden shadow-md">
+          <div className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-2xl overflow-hidden shadow-md">
             <img src="/logo.png" alt="OmniConvert" className="h-full w-full object-cover" />
           </div>
           <div>
-            <p className="text-lg font-semibold leading-tight dark:text-white">OmniConverter</p>
+            <p className="text-base sm:text-lg font-semibold leading-tight dark:text-white">OmniConverter</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">Professional File Converter</p>
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex items-center gap-1 text-sm">
+        {/* Mobile buttons */}
+        <div className="flex items-center gap-2 sm:hidden">
+          <button type="button" onClick={onToggleDark} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+            {dark
+              ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            }
+          </button>
+          <button type="button" onClick={() => setMobileOpen(!mobileOpen)} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+              {mobileOpen
+                ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
+            </svg>
+          </button>
+        </div>
+
+        {/* Desktop Nav */}
+        <nav className="hidden sm:flex items-center gap-1 text-sm">
 
           {/* Tools — dropdown ke kiri */}
           <Dropdown label="Tools" open={openMenu === 'tools'} onToggle={toggle('tools')} align="left">
@@ -235,6 +253,24 @@ export default function Header({ onStartClick, dark, onToggleDark }) {
           </button>
         </nav>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="mt-4 flex flex-col gap-1 border-t border-slate-100 dark:border-slate-700 pt-4 sm:hidden">
+          {['Tools', 'Pricing', 'API', 'FAQ'].map((item) => (
+            <button key={item} type="button" className="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">
+              {item}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => { setMobileOpen(false); onStartClick?.() }}
+            className="mt-2 rounded-full bg-[#4f46e5] px-4 py-2.5 text-sm font-semibold text-white"
+          >
+            Mulai Gratis
+          </button>
+        </div>
+      )}
     </header>
   )
 }
