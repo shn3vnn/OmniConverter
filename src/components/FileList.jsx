@@ -7,7 +7,7 @@ const ALL_FORMATS = ['PDF', 'DOCX', 'DOC', 'ODT', 'TXT', 'PPT', 'PPTX', 'XLS', '
 const SUPPORTED_FORMATS = {
   docx: ['pdf', 'doc', 'odt', 'txt'],
   doc:  ['pdf', 'docx', 'odt'],
-  pdf:  ['docx'],
+  pdf:  ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'html'],
   pptx: ['pdf', 'ppt'],
   ppt:  ['pdf', 'pptx'],
   xlsx: ['pdf', 'xls', 'csv'],

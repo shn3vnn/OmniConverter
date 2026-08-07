@@ -143,13 +143,14 @@ export async function convertFile(file, targetFormat, onProgress) {
     return convertImageFormat(file, targetFormat)
   }
 
-  // PDF → DOCX: langsung CloudConvert (backend tidak support)
-  if (ext === 'pdf' && targetFormat === 'docx') {
+  // PDF → format lain: langsung CloudConvert
+  const CLOUD_ONLY_FROM_PDF = ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'html']
+  if (ext === 'pdf' && CLOUD_ONLY_FROM_PDF.includes(targetFormat)) {
     if (hasApiKey()) {
       const { blob } = await convertFileCloud(file, targetFormat, onProgress)
       return blob
     }
-    throw new Error('Konversi PDF → Word membutuhkan CloudConvert API key.')
+    throw new Error(`Konversi PDF → ${targetFormat.toUpperCase()} membutuhkan CloudConvert API key.`)
   }
 
   // Priority 1: Local backend (LibreOffice)
