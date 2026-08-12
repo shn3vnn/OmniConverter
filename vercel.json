@@ -9,5 +9,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!assets|favicon|logo|icons).*)",
+      "destination": "/index.html"
+    }
   ]
 }

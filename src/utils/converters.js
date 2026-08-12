@@ -127,11 +127,6 @@ export async function convertImageFormat(file, outputFormat) {
 
 // ─── Main entry point ─────────────────────────────────────────────────────────
 
-const hasApiKey = () => {
-  const key = import.meta.env.VITE_CLOUDCONVERT_API_KEY
-  return key && key !== 'your_api_key_here'
-}
-
 export async function convertFile(file, targetFormat, onProgress) {
   const ext = file.name.split('.').pop()?.toLowerCase()
 
@@ -143,7 +138,7 @@ export async function convertFile(file, targetFormat, onProgress) {
     return convertImageFormat(file, targetFormat)
   }
 
-  // Format yang butuh CloudConvert langsung
+  // Format yang butuh CloudConvert (via backend proxy)
   const CLOUD_ONLY_SOURCES = ['pdf', 'tiff', 'tif', 'html', 'htm']
   const CLOUD_FROM_PDF = ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'html']
   const CLOUD_TO_PDF = ['jpg', 'jpeg', 'png', 'webp', 'tiff', 'tif', 'html', 'htm']
@@ -154,11 +149,8 @@ export async function convertFile(file, targetFormat, onProgress) {
     (CLOUD_ONLY_SOURCES.includes(ext) && ext !== 'pdf')
 
   if (needsCloud) {
-    if (hasApiKey()) {
-      const { blob } = await convertFileCloud(file, targetFormat, onProgress)
-      return blob
-    }
-    throw new Error(`Konversi ${ext.toUpperCase()} → ${targetFormat.toUpperCase()} membutuhkan CloudConvert API key.`)
+    const { blob } = await convertFileCloud(file, targetFormat, onProgress)
+    return blob
   }
 
   // Priority 1: Local backend (LibreOffice)
@@ -168,26 +160,14 @@ export async function convertFile(file, targetFormat, onProgress) {
       return await convertWithLocalBackend(file, targetFormat, onProgress)
     } catch (err) {
       if (err.useCloud) {
-        if (hasApiKey()) {
-          const { blob } = await convertFileCloud(file, targetFormat, onProgress)
-          return blob
-        }
-        throw new Error('Konversi ini membutuhkan CloudConvert, tetapi API key tidak tersedia.')
+        const { blob } = await convertFileCloud(file, targetFormat, onProgress)
+        return blob
       }
       throw err
     }
   }
 
-  // Priority 2: CloudConvert API
-  if (hasApiKey()) {
-    const { blob } = await convertFileCloud(file, targetFormat, onProgress)
-    return blob
-  }
-
-  // Priority 3: Local fallback (mammoth + html2canvas)
-  if (ext === 'docx' && targetFormat === 'pdf') {
-    return convertDocxToPdfLocal(file)
-  }
-
-  throw new Error(`Konversi ${ext?.toUpperCase()} → ${targetFormat.toUpperCase()} belum didukung.`)
+  // Priority 2: CloudConvert via backend proxy
+  const { blob } = await convertFileCloud(file, targetFormat, onProgress)
+  return blob
 }
