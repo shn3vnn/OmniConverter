@@ -51,13 +51,17 @@ const FAQS = [
   { q: 'Apakah perlu install sesuatu?', a: 'Tidak perlu install apapun di browser.' },
 ]
 
-function Dropdown({ label, children, open, onToggle, align = 'left' }) {
+function Dropdown({ label, children, open, onToggle, align = 'left', center = false }) {
   const ref = useRef(null)
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onToggle(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [onToggle])
+
+  const posClass = center
+    ? 'left-1/2 -translate-x-1/2'
+    : align === 'right' ? 'right-0' : 'left-0'
 
   return (
     <div ref={ref} className="relative">
@@ -72,7 +76,7 @@ function Dropdown({ label, children, open, onToggle, align = 'left' }) {
         </svg>
       </button>
       {open && (
-        <div className={`absolute top-full z-50 mt-2 w-max rounded-[20px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-xl ${align === 'right' ? 'right-0' : 'left-0'}`}>
+        <div className={`absolute top-full z-50 mt-2 w-max rounded-[20px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-xl ${posClass}`}>
           {children}
         </div>
       )}
@@ -132,7 +136,7 @@ export default function Header({ onStartClick, dark, onToggleDark }) {
         <nav className="hidden sm:flex items-center gap-1 text-sm">
 
           {/* Tools dropdown */}
-          <Dropdown label="Tools" open={openMenu === 'tools'} onToggle={toggle('tools')} align="left">
+          <Dropdown label="Tools" open={openMenu === 'tools'} onToggle={toggle('tools')} center>
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-400">Semua Tools</p>
             <div className="grid grid-cols-2 gap-3 min-w-[480px]">
               {ALL_TOOLS.map((cat) => (

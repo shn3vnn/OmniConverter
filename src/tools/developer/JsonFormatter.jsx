@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import ToolLayout from '../../components/ToolLayout'
 
 export default function JsonFormatter() {
   const [input, setInput] = useState('')
@@ -65,6 +66,11 @@ export default function JsonFormatter() {
   const charCount = input.length
 
   return (
+    <ToolLayout breadcrumb={[
+      { label: 'Home', href: '/' },
+      { label: 'Developer Tools' },
+      { label: 'JSON Formatter' },
+    ]}>
     <div className="mt-5 space-y-5">
       {/* Hero */}
       <div className="rounded-[30px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm sm:p-8">
@@ -137,5 +143,6 @@ export default function JsonFormatter() {
         </div>
       )}
     </div>
+    </ToolLayout>
   )
 }

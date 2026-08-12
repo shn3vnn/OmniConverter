@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import QRCode from 'qrcode'
+import ToolLayout from '../../components/ToolLayout'
 
 export default function QrGenerator() {
   const [text, setText] = useState('')
@@ -46,6 +47,11 @@ export default function QrGenerator() {
   }
 
   return (
+    <ToolLayout breadcrumb={[
+      { label: 'Home', href: '/' },
+      { label: 'Generators' },
+      { label: 'QR Generator' },
+    ]}>
     <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
       <section className="space-y-5">
         {/* Hero */}
@@ -136,5 +142,6 @@ export default function QrGenerator() {
         </div>
       </aside>
     </div>
+    </ToolLayout>
   )
 }

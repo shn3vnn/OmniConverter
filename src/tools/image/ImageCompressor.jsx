@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { formatBytes } from '../../utils/formatBytes'
+import ToolLayout from '../../components/ToolLayout'
 
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_SIZE = 20 * 1024 * 1024
@@ -138,6 +139,11 @@ export default function ImageCompressor() {
   const isPng = outputFormat === 'png'
 
   return (
+    <ToolLayout breadcrumb={[
+      { label: 'Home', href: '/' },
+      { label: 'Image Tools' },
+      { label: 'Image Compressor' },
+    ]}>
     <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
       <section className="space-y-5">
         {/* Hero */}
@@ -356,5 +362,6 @@ export default function ImageCompressor() {
         </div>
       </aside>
     </div>
+    </ToolLayout>
   )
 }
