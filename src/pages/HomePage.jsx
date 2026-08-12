@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useMultiConverter } from '../hooks/useMultiConverter'
 import { useEngineStatus } from '../hooks/useEngineStatus'
 import DropZone from '../components/DropZone'
@@ -6,13 +7,69 @@ import FileList from '../components/FileList'
 import EngineStatus from '../components/EngineStatus'
 import MergePdf from '../components/MergePdf'
 
+const CATEGORIES = [
+  {
+    id: 'pdf',
+    label: 'PDF & Dokumen',
+    color: 'text-red-500',
+    bg: 'bg-red-50 dark:bg-red-950',
+    border: 'border-red-100 dark:border-red-900',
+    tools: [
+      { label: 'Convert File', desc: 'DOCX, PDF, XLSX, PPTX dan lainnya', href: '/', internal: true },
+      { label: 'Merge PDF', desc: 'Gabungkan beberapa PDF jadi satu', href: '/', tab: 'merge', internal: true },
+    ],
+  },
+  {
+    id: 'image',
+    label: 'Image Tools',
+    color: 'text-sky-500',
+    bg: 'bg-sky-50 dark:bg-sky-950',
+    border: 'border-sky-100 dark:border-sky-900',
+    tools: [
+      { label: 'Image Compressor', desc: 'Kompres JPG, PNG, WebP di browser', href: '/tools/image/compress' },
+    ],
+  },
+  {
+    id: 'developer',
+    label: 'Developer Tools',
+    color: 'text-violet-500',
+    bg: 'bg-violet-50 dark:bg-violet-950',
+    border: 'border-violet-100 dark:border-violet-900',
+    tools: [
+      { label: 'JSON Formatter', desc: 'Format, minify, dan validasi JSON', href: '/tools/developer/json' },
+    ],
+  },
+  {
+    id: 'generators',
+    label: 'Generators',
+    color: 'text-emerald-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-950',
+    border: 'border-emerald-100 dark:border-emerald-900',
+    tools: [
+      { label: 'QR Generator', desc: 'Buat QR Code dari URL atau teks', href: '/tools/generator/qr' },
+    ],
+  },
+]
+
 export default function HomePage({ fileInputRef: externalRef }) {
   const { items, isConverting, zipUrl, doneCount, errorCount, addFiles, removeItem, setFormat, convertAll, reset } = useMultiConverter()
   const [isDragging, setIsDragging] = useState(false)
   const internalRef = useRef(null)
   const fileInputRef = externalRef || internalRef
   const { engine, recheck } = useEngineStatus()
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState('convert')
+  const [search, setSearch] = useState('')
+
+  // Support navigasi ke tab merge dari Header
+  useEffect(() => {
+    if (location.state?.tab) setActiveTab(location.state.tab)
+  }, [location.state])
+
+  const allTools = CATEGORIES.flatMap((c) => c.tools.map((t) => ({ ...t, category: c.label, color: c.color, bg: c.bg, border: c.border })))
+  const filtered = search.trim()
+    ? allTools.filter((t) => t.label.toLowerCase().includes(search.toLowerCase()) || t.desc.toLowerCase().includes(search.toLowerCase()))
+    : []
 
   const hasFiles = items.length > 0
   const allDone = hasFiles && items.every((it) => it.status === 'done' || it.status === 'error')
@@ -24,6 +81,77 @@ export default function HomePage({ fileInputRef: externalRef }) {
 
   return (
     <>
+      {/* Hero + Search */}
+      <div className="mt-5 rounded-[30px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm sm:p-10">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#4f46e5]">All-in-One Online Tools</p>
+        <h1 className="mt-3 text-3xl font-bold leading-tight text-slate-900 dark:text-white sm:text-4xl">
+          Everything you need, in one place.
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
+          Convert, compress, generate, and simplify your everyday tasks.
+        </p>
+        {/* Search */}
+        <div className="relative mt-6 max-w-md">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tools..."
+            className="w-full rounded-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 py-2.5 pl-10 pr-4 text-sm text-slate-800 dark:text-slate-200 outline-none focus:border-[#4f46e5] transition"
+          />
+        </div>
+        {/* Search results */}
+        {filtered.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {filtered.map((t) => (
+              <Link
+                key={t.label}
+                to={t.href}
+                onClick={() => { setSearch(''); if (t.tab) setActiveTab(t.tab) }}
+                className={`flex items-center gap-2 rounded-full border ${t.border} ${t.bg} px-3 py-1.5 text-sm font-medium ${t.color} transition hover:opacity-80`}
+              >
+                {t.label}
+              </Link>
+            ))}
+          </div>
+        )}
+        {search.trim() && filtered.length === 0 && (
+          <p className="mt-3 text-sm text-slate-400">Tidak ada tools yang cocok dengan "{search}".</p>
+        )}
+      </div>
+
+      {/* Category Grid */}
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {CATEGORIES.map((cat) => (
+          <div key={cat.id} className={`rounded-[24px] border ${cat.border} ${cat.bg} p-4`}>
+            <p className={`text-xs font-bold uppercase tracking-widest ${cat.color}`}>{cat.label}</p>
+            <div className="mt-3 space-y-2">
+              {cat.tools.map((tool) => (
+                <Link
+                  key={tool.label}
+                  to={tool.href}
+                  onClick={() => { if (tool.tab) setActiveTab(tool.tab) }}
+                  className="flex items-start gap-2 rounded-[14px] bg-white/70 dark:bg-slate-800/70 p-3 transition hover:bg-white dark:hover:bg-slate-800 shadow-sm"
+                >
+                  <div className="mt-0.5 flex-shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-4 w-4 ${cat.color}`}>
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{tool.label}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{tool.desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Tab switcher */}
       <div className="mt-5 flex gap-2">
         {TABS.map((tab) => (
